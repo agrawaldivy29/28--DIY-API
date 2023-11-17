@@ -2,15 +2,34 @@ import express from "express";
 
 const app = express();
 const port = 3000;
-const masterKey = "4VGP2DN-6EWM4SJ-N6FGRHV-Z3PR3TT";
 
-app.use(express.urlencoded({ extended: true }));
+const url = app.use(express.urlencoded({ extended: true }));
 
 //1. GET a random joke
+app.get("/", (req, res) => {
+  var randomIndex = Math.floor(Math.random() * jokes.length);
+  res.json(jokes[randomIndex]);
+});
 
 //2. GET a specific joke
+app.get("/jokes/:jokeId", (req, res) => {
+  const jokeId = parseInt(req.params.jokeId);
+  const foundJoke = jokes.find((joke) => joke.id === jokeId);
+  // console.log(foundJoke);
+  if (foundJoke == undefined) res.send("The requested joke does not exist");
+  else res.json(foundJoke);
+});
 
 //3. GET a jokes by filtering on the joke type
+app.get("/filter", (req, res) => {
+  const jokeType = req.query.type;
+  console.log(jokeType);
+  const filteredJokes = jokes.filter((jokes) => jokes.jokeType === jokeType);
+  // console.log(filteredJokes);
+  if (filteredJokes.length === 0) res.send("There is no joke for the requested filters");
+  else res.json(filteredJokes);
+  // res.json(filteredJokes);
+});
 
 //4. POST a new joke
 
