@@ -1,12 +1,9 @@
 import express from "express";
-// require('dotenv').config();
 import dotenv from "dotenv";
+
 dotenv.config();
-
 const app = express();
-const port = 3000;
-
-const url = app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 //1. GET a random joke
 app.get("/", (req, res) => {
@@ -18,7 +15,6 @@ app.get("/", (req, res) => {
 app.get("/jokes/:jokeId", (req, res) => {
   const jokeId = parseInt(req.params.jokeId);
   const foundJoke = jokes.find((joke) => joke.id === jokeId);
-  // console.log(foundJoke);
   if (foundJoke == undefined) res.send("The requested joke does not exist");
   else res.json(foundJoke);
 });
@@ -72,7 +68,6 @@ app.patch("/jokes/:id", (req, res) => {
 //7. DELETE Specific joke
 app.delete("/jokes/:id", (req, res) => {
   const jokeId = parseInt(req.params.id);
-  console.log(jokeId);
   const deleteJoke = jokes.find((joke) => joke.id === jokeId);
   if (deleteJoke == undefined)
     res.send(`Joke with id ${jokeId} does not exist`);
@@ -83,8 +78,6 @@ app.delete("/jokes/:id", (req, res) => {
 //8. DELETE All jokes
 app.delete("/all", (req, res) => {
   const userKey = req.query.key;
-  console.log(userKey);
-  console.log(process.env.MASTERKEY);
   if (userKey === process.env.masterKey) {
     jokes = [];
     res.sendStatus(200);
@@ -95,8 +88,8 @@ app.delete("/all", (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Successfully started server on port ${port}.`);
+app.listen(process.env.port, () => {
+  console.log(`Successfully started server on port ${process.env.port}.`);
 });
 
 var jokes = [
