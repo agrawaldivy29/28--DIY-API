@@ -23,19 +23,47 @@ app.get("/jokes/:jokeId", (req, res) => {
 //3. GET a jokes by filtering on the joke type
 app.get("/filter", (req, res) => {
   const jokeType = req.query.type;
-  console.log(jokeType);
   const filteredJokes = jokes.filter((jokes) => jokes.jokeType === jokeType);
-  // console.log(filteredJokes);
   if (filteredJokes.length === 0) res.send("There is no joke for the requested filters");
   else res.json(filteredJokes);
-  // res.json(filteredJokes);
 });
 
 //4. POST a new joke
+app.post("/jokes", (req, res) => {
+  const newJoke = {
+    id: jokes.length+1,
+    jokeText: req.body.text,
+    jokeType: req.body.type
+  }
+  jokes.push(newJoke);
+  res.json(jokes.slice(-1));
+})
 
 //5. PUT a joke
+app.put("/jokes/:id", (req, res) => {
+  const jokeId = parseInt(req.params.id);
+  for (var i=0; i<jokes.length; i++) {
+    if (jokes[i].id === jokeId) {
+      jokes[i].jokeText = req.body.text;
+      jokes[i].jokeType = req.body.type;
+      res.json(jokes[i]);
+    }
+  }
+  res.send(`Joke with id ${jokeId} does not exist`);
+})
 
 //6. PATCH a joke
+app.patch("/jokes/:id", (req, res) => {
+  const jokeId = parseInt(req.params.id);
+  for (var i=0; i<jokes.length; i++) {
+    if (jokes[i].id === jokeId) {
+      if (req.body.text) jokes[i].jokeText = req.body.text;
+      if (req.body.type) jokes[i].jokeType = req.body.type;
+      res.json(jokes[i]);
+    }
+  }
+  res.send(`Joke with id ${jokeId} does not exist`);
+})
 
 //7. DELETE Specific joke
 
