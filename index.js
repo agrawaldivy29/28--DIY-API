@@ -1,4 +1,7 @@
 import express from "express";
+// require('dotenv').config();
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const port = 3000;
@@ -24,25 +27,26 @@ app.get("/jokes/:jokeId", (req, res) => {
 app.get("/filter", (req, res) => {
   const jokeType = req.query.type;
   const filteredJokes = jokes.filter((jokes) => jokes.jokeType === jokeType);
-  if (filteredJokes.length === 0) res.send("There is no joke for the requested filters");
+  if (filteredJokes.length === 0)
+    res.send("There is no joke for the requested filters");
   else res.json(filteredJokes);
 });
 
 //4. POST a new joke
 app.post("/jokes", (req, res) => {
   const newJoke = {
-    id: jokes.length+1,
+    id: jokes.length + 1,
     jokeText: req.body.text,
-    jokeType: req.body.type
-  }
+    jokeType: req.body.type,
+  };
   jokes.push(newJoke);
   res.json(jokes.slice(-1));
-})
+});
 
 //5. PUT a joke
 app.put("/jokes/:id", (req, res) => {
   const jokeId = parseInt(req.params.id);
-  for (var i=0; i<jokes.length; i++) {
+  for (var i = 0; i < jokes.length; i++) {
     if (jokes[i].id === jokeId) {
       jokes[i].jokeText = req.body.text;
       jokes[i].jokeType = req.body.type;
@@ -50,12 +54,12 @@ app.put("/jokes/:id", (req, res) => {
     }
   }
   res.send(`Joke with id ${jokeId} does not exist`);
-})
+});
 
 //6. PATCH a joke
 app.patch("/jokes/:id", (req, res) => {
   const jokeId = parseInt(req.params.id);
-  for (var i=0; i<jokes.length; i++) {
+  for (var i = 0; i < jokes.length; i++) {
     if (jokes[i].id === jokeId) {
       if (req.body.text) jokes[i].jokeText = req.body.text;
       if (req.body.type) jokes[i].jokeType = req.body.type;
@@ -63,11 +67,33 @@ app.patch("/jokes/:id", (req, res) => {
     }
   }
   res.send(`Joke with id ${jokeId} does not exist`);
-})
+});
 
 //7. DELETE Specific joke
+app.delete("/jokes/:id", (req, res) => {
+  const jokeId = parseInt(req.params.id);
+  console.log(jokeId);
+  const deleteJoke = jokes.find((joke) => joke.id === jokeId);
+  if (deleteJoke == undefined)
+    res.send(`Joke with id ${jokeId} does not exist`);
+  jokes = jokes.filter((joke) => joke.id != jokeId);
+  res.json(deleteJoke);
+});
 
 //8. DELETE All jokes
+app.delete("/all", (req, res) => {
+  const userKey = req.query.key;
+  console.log(userKey);
+  console.log(process.env.MASTERKEY);
+  if (userKey === process.env.masterKey) {
+    jokes = [];
+    res.sendStatus(200);
+  } else {
+    res
+      .status(404)
+      .json({ error: `You are not authorised to perform this action.` });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Successfully started server on port ${port}.`);
